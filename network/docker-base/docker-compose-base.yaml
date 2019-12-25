@@ -2,8 +2,8 @@ version: '2'
 
 services:
 
-  orderer.property-registration-network.com:
-    container_name: orderer.property-registration-network.com
+  orderer.vehicle-exchange-network.com:
+    container_name: orderer.vehicle-exchange-network.com
     image: hyperledger/fabric-orderer:latest
     environment:
       - FABRIC_LOGGING_SPEC=INFO
@@ -12,7 +12,7 @@ services:
       - ORDERER_GENERAL_GENESISFILE=/var/hyperledger/orderer/orderer.genesis.block
       - ORDERER_GENERAL_LOCALMSPID=OrdererMSP
       - ORDERER_GENERAL_LOCALMSPDIR=/var/hyperledger/orderer/msp
-      # enable TLS
+      # enabled TLS
       - ORDERER_GENERAL_TLS_ENABLED=false
       - ORDERER_GENERAL_TLS_PRIVATEKEY=/var/hyperledger/orderer/tls/server.key
       - ORDERER_GENERAL_TLS_CERTIFICATE=/var/hyperledger/orderer/tls/server.crt
@@ -22,124 +22,193 @@ services:
     command: orderer
     volumes:
     - ../channel-artifacts/genesis.block:/var/hyperledger/orderer/orderer.genesis.block
-    - ../crypto-config/ordererOrganizations/property-registration-network.com/orderers/orderer.property-registration-network.com/msp:/var/hyperledger/orderer/msp
-    - ../crypto-config/ordererOrganizations/property-registration-network.com/orderers/orderer.property-registration-network.com/tls/:/var/hyperledger/orderer/tls
-    - orderer.property-registration-network.com:/var/hyperledger/production/orderer
+    - ../crypto-config/ordererOrganizations/vehicle-exchange-network.com/orderers/orderer.vehicle-exchange-network.com/msp:/var/hyperledger/orderer/msp
+    - ../crypto-config/ordererOrganizations/vehicle-exchange-network.com/orderers/orderer.vehicle-exchange-network.com/tls/:/var/hyperledger/orderer/tls
+    - orderer.vehicle-exchange-network.com:/var/hyperledger/production/orderer
     ports:
       - 7050:7050
 
-  peer0.registrar.property-registration-network.com:
-    container_name: peer0.registrar.property-registration-network.com
+  peer0.carcompany.vehicle-exchange-network.com:
+    container_name: peer0.carcompany.vehicle-exchange-network.com
     extends:
       file: docker-compose-peer.yaml
       service: peer-base
     environment:
-      - CORE_PEER_ID=peer0.registrar.property-registration-network.com
-      - CORE_PEER_ADDRESS=peer0.registrar.property-registration-network.com:7051
+      - CORE_PEER_ID=peer0.carcompany.vehicle-exchange-network.com
+      - CORE_PEER_ADDRESS=peer0.carcompany.vehicle-exchange-network.com:7051
       - CORE_PEER_LISTENADDRESS=0.0.0.0:7051
-      - CORE_PEER_CHAINCODEADDRESS=peer0.registrar.property-registration-network.com:7053
+      - CORE_PEER_CHAINCODEADDRESS=peer0.carcompany.vehicle-exchange-network.com:7053
       - CORE_PEER_CHAINCODELISTENADDRESS=0.0.0.0:7053
-      - CORE_PEER_GOSSIP_BOOTSTRAP=peer1.registrar.property-registration-network.com:8051
-      - CORE_PEER_GOSSIP_EXTERNALENDPOINT=peer0.registrar.property-registration-network.com:7051
-      - CORE_PEER_LOCALMSPID=registrarMSP
+      - CORE_PEER_GOSSIP_BOOTSTRAP=peer1.carcompany.vehicle-exchange-network.com:8051
+      - CORE_PEER_GOSSIP_EXTERNALENDPOINT=peer0.carcompany.vehicle-exchange-network.com:7051
+      - CORE_PEER_LOCALMSPID=carcompanyMSP
     volumes:
         - /var/run/:/host/var/run/
-        - ../crypto-config/peerOrganizations/registrar.property-registration-network.com/peers/peer0.registrar.property-registration-network.com/msp:/etc/hyperledger/fabric/msp
-        - ../crypto-config/peerOrganizations/registrar.property-registration-network.com/peers/peer0.registrar.property-registration-network.com/tls:/etc/hyperledger/fabric/tls
-        - peer0.registrar.property-registration-network.com:/var/hyperledger/production
+        - ../crypto-config/peerOrganizations/carcompany.vehicle-exchange-network.com/peers/peer0.carcompany.vehicle-exchange-network.com/msp:/etc/hyperledger/fabric/msp
+        - ../crypto-config/peerOrganizations/carcompany.vehicle-exchange-network.com/peers/peer0.carcompany.vehicle-exchange-network.com/tls:/etc/hyperledger/fabric/tls
+        - peer0.carcompany.vehicle-exchange-network.com:/var/hyperledger/production
     ports:
       - 7051:7051
       - 7053:7053
 
-  peer1.registrar.property-registration-network.com:
-    container_name: peer1.registrar.property-registration-network.com
+  peer1.carcompany.vehicle-exchange-network.com:
+    container_name: peer1.carcompany.vehicle-exchange-network.com
     extends:
       file: docker-compose-peer.yaml
       service: peer-base
     environment:
-      - CORE_PEER_ID=peer1.registrar.property-registration-network.com
-      - CORE_PEER_ADDRESS=peer1.registrar.property-registration-network.com:8051
+      - CORE_PEER_ID=peer1.carcompany.vehicle-exchange-network.com
+      - CORE_PEER_ADDRESS=peer1.carcompany.vehicle-exchange-network.com:8051
       - CORE_PEER_LISTENADDRESS=0.0.0.0:8051
-      - CORE_PEER_CHAINCODEADDRESS=peer0.registrar.property-registration-network.com:8053
+      - CORE_PEER_CHAINCODEADDRESS=peer0.carcompany.vehicle-exchange-network.com:8053
       - CORE_PEER_CHAINCODELISTENADDRESS=0.0.0.0:8053
-      - CORE_PEER_GOSSIP_EXTERNALENDPOINT=peer1.registrar.property-registration-network.com:8051
-      - CORE_PEER_GOSSIP_BOOTSTRAP=peer0.registrar.property-registration-network.com:7051
-      - CORE_PEER_LOCALMSPID=registrarMSP
+      - CORE_PEER_GOSSIP_EXTERNALENDPOINT=peer1.carcompany.vehicle-exchange-network.com:8051
+      - CORE_PEER_GOSSIP_BOOTSTRAP=peer0.carcompany.vehicle-exchange-network.com:7051
+      - CORE_PEER_LOCALMSPID=carcompanyMSP
     volumes:
         - /var/run/:/host/var/run/
-        - ../crypto-config/peerOrganizations/registrar.property-registration-network.com/peers/peer1.registrar.property-registration-network.com/msp:/etc/hyperledger/fabric/msp
-        - ../crypto-config/peerOrganizations/registrar.property-registration-network.com/peers/peer1.registrar.property-registration-network.com/tls:/etc/hyperledger/fabric/tls
-        - peer1.registrar.property-registration-network.com:/var/hyperledger/production
+        - ../crypto-config/peerOrganizations/carcompany.vehicle-exchange-network.com/peers/peer1.carcompany.vehicle-exchange-network.com/msp:/etc/hyperledger/fabric/msp
+        - ../crypto-config/peerOrganizations/carcompany.vehicle-exchange-network.com/peers/peer1.carcompany.vehicle-exchange-network.com/tls:/etc/hyperledger/fabric/tls
+        - peer1.carcompany.vehicle-exchange-network.com:/var/hyperledger/production
 
     ports:
       - 8051:8051
       - 8053:8053
 
-  peer0.users.property-registration-network.com:
-    container_name: peer0.users.property-registration-network.com
+  peer0.ind1.vehicle-exchange-network.com:
+    container_name: peer0.ind1.vehicle-exchange-network.com
     extends:
       file: docker-compose-peer.yaml
       service: peer-base
     environment:
-      - CORE_PEER_ID=peer0.users.property-registration-network.com
-      - CORE_PEER_ADDRESS=peer0.users.property-registration-network.com:9051
+      - CORE_PEER_ID=peer0.ind1.vehicle-exchange-network.com
+      - CORE_PEER_ADDRESS=peer0.ind1.vehicle-exchange-network.com:9051
       - CORE_PEER_LISTENADDRESS=0.0.0.0:9051
-      - CORE_PEER_CHAINCODEADDRESS=peer0.users.property-registration-network.com:9053
+      - CORE_PEER_CHAINCODEADDRESS=peer0.ind1.vehicle-exchange-network.com:9053
       - CORE_PEER_CHAINCODELISTENADDRESS=0.0.0.0:9053
-      - CORE_PEER_GOSSIP_EXTERNALENDPOINT=peer0.users.property-registration-network.com:9051
-      - CORE_PEER_GOSSIP_BOOTSTRAP=peer1.users.property-registration-network.com:10051
-      - CORE_PEER_LOCALMSPID=usersMSP
+      - CORE_PEER_GOSSIP_EXTERNALENDPOINT=peer0.ind1.vehicle-exchange-network.com:9051
+      - CORE_PEER_GOSSIP_BOOTSTRAP=peer1.ind1.vehicle-exchange-network.com:10051
+      - CORE_PEER_LOCALMSPID=ind1MSP
     volumes:
         - /var/run/:/host/var/run/
-        - ../crypto-config/peerOrganizations/users.property-registration-network.com/peers/peer0.users.property-registration-network.com/msp:/etc/hyperledger/fabric/msp
-        - ../crypto-config/peerOrganizations/users.property-registration-network.com/peers/peer0.users.property-registration-network.com/tls:/etc/hyperledger/fabric/tls
-        - peer0.users.property-registration-network.com:/var/hyperledger/production
+        - ../crypto-config/peerOrganizations/ind1.vehicle-exchange-network.com/peers/peer0.ind1.vehicle-exchange-network.com/msp:/etc/hyperledger/fabric/msp
+        - ../crypto-config/peerOrganizations/ind1.vehicle-exchange-network.com/peers/peer0.ind1.vehicle-exchange-network.com/tls:/etc/hyperledger/fabric/tls
+        - peer0.ind1.vehicle-exchange-network.com:/var/hyperledger/production
     ports:
       - 9051:9051
       - 9053:9053
 
-  peer1.users.property-registration-network.com:
-    container_name: peer1.users.property-registration-network.com
+  peer1.ind1.vehicle-exchange-network.com:
+    container_name: peer1.ind1.vehicle-exchange-network.com
     extends:
       file: docker-compose-peer.yaml
       service: peer-base
     environment:
-      - CORE_PEER_ID=peer1.users.property-registration-network.com
-      - CORE_PEER_ADDRESS=peer1.users.property-registration-network.com:10051
+      - CORE_PEER_ID=peer1.ind1.vehicle-exchange-network.com
+      - CORE_PEER_ADDRESS=peer1.ind1.vehicle-exchange-network.com:10051
       - CORE_PEER_LISTENADDRESS=0.0.0.0:10051
-      - CORE_PEER_CHAINCODEADDRESS=peer0.users.property-registration-network.com:10053
+      - CORE_PEER_CHAINCODEADDRESS=peer0.ind1.vehicle-exchange-network.com:10053
       - CORE_PEER_CHAINCODELISTENADDRESS=0.0.0.0:10053
-      - CORE_PEER_GOSSIP_EXTERNALENDPOINT=peer1.users.property-registration-network.com:10051
-      - CORE_PEER_GOSSIP_BOOTSTRAP=peer0.users.property-registration-network.com:9051
-      - CORE_PEER_LOCALMSPID=usersMSP
+      - CORE_PEER_GOSSIP_EXTERNALENDPOINT=peer1.ind1.vehicle-exchange-network.com:10051
+      - CORE_PEER_GOSSIP_BOOTSTRAP=peer0.ind1.vehicle-exchange-network.com:9051
+      - CORE_PEER_LOCALMSPID=ind1MSP
     volumes:
         - /var/run/:/host/var/run/
-        - ../crypto-config/peerOrganizations/users.property-registration-network.com/peers/peer1.users.property-registration-network.com/msp:/etc/hyperledger/fabric/msp
-        - ../crypto-config/peerOrganizations/users.property-registration-network.com/peers/peer1.users.property-registration-network.com/tls:/etc/hyperledger/fabric/tls
-        - peer1.users.property-registration-network.com:/var/hyperledger/production
+        - ../crypto-config/peerOrganizations/ind1.vehicle-exchange-network.com/peers/peer1.ind1.vehicle-exchange-network.com/msp:/etc/hyperledger/fabric/msp
+        - ../crypto-config/peerOrganizations/ind1.vehicle-exchange-network.com/peers/peer1.ind1.vehicle-exchange-network.com/tls:/etc/hyperledger/fabric/tls
+        - peer1.ind1.vehicle-exchange-network.com:/var/hyperledger/production
     ports:
       - 10051:10051
       - 10053:10053
 
-  peer2.users.property-registration-network.com:
-    container_name: peer2.users.property-registration-network.com
+  peer0.ind2.vehicle-exchange-network.com:
+    container_name: peer0.ind2.vehicle-exchange-network.com
     extends:
       file: docker-compose-peer.yaml
       service: peer-base
     environment:
-      - CORE_PEER_ID=peer2.users.property-registration-network.com
-      - CORE_PEER_ADDRESS=peer2.users.property-registration-network.com:11051
+      - CORE_PEER_ID=peer0.ind2.vehicle-exchange-network.com
+      - CORE_PEER_ADDRESS=peer0.ind2.vehicle-exchange-network.com:11051
       - CORE_PEER_LISTENADDRESS=0.0.0.0:11051
-      - CORE_PEER_CHAINCODEADDRESS=peer0.users.property-registration-network.com:11053
+      - CORE_PEER_CHAINCODEADDRESS=peer0.ind2.vehicle-exchange-network.com:11053
       - CORE_PEER_CHAINCODELISTENADDRESS=0.0.0.0:11053
-      - CORE_PEER_GOSSIP_EXTERNALENDPOINT=peer2.users.property-registration-network.com:11051
-      - CORE_PEER_GOSSIP_BOOTSTRAP=peer0.users.property-registration-network.com:9051
-      - CORE_PEER_LOCALMSPID=usersMSP
+      - CORE_PEER_GOSSIP_EXTERNALENDPOINT=peer0.ind2.vehicle-exchange-network.com:11051
+      - CORE_PEER_GOSSIP_BOOTSTRAP=peer1.ind2.vehicle-exchange-network.com:12051
+      - CORE_PEER_LOCALMSPID=ind2MSP
     volumes:
         - /var/run/:/host/var/run/
-        - ../crypto-config/peerOrganizations/users.property-registration-network.com/peers/peer2.users.property-registration-network.com/msp:/etc/hyperledger/fabric/msp
-        - ../crypto-config/peerOrganizations/users.property-registration-network.com/peers/peer2.users.property-registration-network.com/tls:/etc/hyperledger/fabric/tls
-        - peer2.users.property-registration-network.com:/var/hyperledger/production
+        - ../crypto-config/peerOrganizations/ind2.vehicle-exchange-network.com/peers/peer0.ind2.vehicle-exchange-network.com/msp:/etc/hyperledger/fabric/msp
+        - ../crypto-config/peerOrganizations/ind2.vehicle-exchange-network.com/peers/peer0.ind2.vehicle-exchange-network.com/tls:/etc/hyperledger/fabric/tls
+        - peer0.ind2.vehicle-exchange-network.com:/var/hyperledger/production
     ports:
       - 11051:11051
       - 11053:11053
+
+  peer1.ind2.vehicle-exchange-network.com:
+    container_name: peer1.ind2.vehicle-exchange-network.com
+    extends:
+      file: docker-compose-peer.yaml
+      service: peer-base
+    environment:
+      - CORE_PEER_ID=peer1.ind2.vehicle-exchange-network.com
+      - CORE_PEER_ADDRESS=peer1.ind2.vehicle-exchange-network.com:12051
+      - CORE_PEER_LISTENADDRESS=0.0.0.0:12051
+      - CORE_PEER_CHAINCODEADDRESS=peer0.ind2.vehicle-exchange-network.com:12053
+      - CORE_PEER_CHAINCODELISTENADDRESS=0.0.0.0:12053
+      - CORE_PEER_GOSSIP_EXTERNALENDPOINT=peer1.ind2.vehicle-exchange-network.com:12051
+      - CORE_PEER_GOSSIP_BOOTSTRAP=peer0.ind2.vehicle-exchange-network.com:11051
+      - CORE_PEER_LOCALMSPID=ind2MSP
+    volumes:
+        - /var/run/:/host/var/run/
+        - ../crypto-config/peerOrganizations/ind2.vehicle-exchange-network.com/peers/peer1.ind2.vehicle-exchange-network.com/msp:/etc/hyperledger/fabric/msp
+        - ../crypto-config/peerOrganizations/ind2.vehicle-exchange-network.com/peers/peer1.ind2.vehicle-exchange-network.com/tls:/etc/hyperledger/fabric/tls
+        - peer1.ind2.vehicle-exchange-network.com:/var/hyperledger/production
+    ports:
+      - 12051:12051
+      - 12053:12053
+
+  peer0.ind3.vehicle-exchange-network.com:
+    container_name: peer0.ind3.vehicle-exchange-network.com
+    extends:
+      file: docker-compose-peer.yaml
+      service: peer-base
+    environment:
+      - CORE_PEER_ID=peer0.ind3.vehicle-exchange-network.com
+      - CORE_PEER_ADDRESS=peer0.ind3.vehicle-exchange-network.com:13051
+      - CORE_PEER_LISTENADDRESS=0.0.0.0:13051
+      - CORE_PEER_CHAINCODEADDRESS=peer0.ind3.vehicle-exchange-network.com:13053
+      - CORE_PEER_CHAINCODELISTENADDRESS=0.0.0.0:13053
+      - CORE_PEER_GOSSIP_EXTERNALENDPOINT=peer0.ind3.vehicle-exchange-network.com:13051
+      - CORE_PEER_GOSSIP_BOOTSTRAP=peer1.ind3.vehicle-exchange-network.com:14051
+      - CORE_PEER_LOCALMSPID=ind3MSP
+    volumes:
+        - /var/run/:/host/var/run/
+        - ../crypto-config/peerOrganizations/ind3.vehicle-exchange-network.com/peers/peer0.ind3.vehicle-exchange-network.com/msp:/etc/hyperledger/fabric/msp
+        - ../crypto-config/peerOrganizations/ind3.vehicle-exchange-network.com/peers/peer0.ind3.vehicle-exchange-network.com/tls:/etc/hyperledger/fabric/tls
+        - peer0.ind2.vehicle-exchange-network.com:/var/hyperledger/production
+    ports:
+      - 13051:13051
+      - 13053:13053
+
+  peer1.ind3.vehicle-exchange-network.com:
+    container_name: peer1.ind3.vehicle-exchange-network.com
+    extends:
+      file: docker-compose-peer.yaml
+      service: peer-base
+    environment:
+      - CORE_PEER_ID=peer1.ind3.vehicle-exchange-network.com
+      - CORE_PEER_ADDRESS=peer1.ind3.vehicle-exchange-network.com:14051
+      - CORE_PEER_LISTENADDRESS=0.0.0.0:14051
+      - CORE_PEER_CHAINCODEADDRESS=peer0.ind3.vehicle-exchange-network.com:14053
+      - CORE_PEER_CHAINCODELISTENADDRESS=0.0.0.0:14053
+      - CORE_PEER_GOSSIP_EXTERNALENDPOINT=peer1.ind3.vehicle-exchange-network.com:14051
+      - CORE_PEER_GOSSIP_BOOTSTRAP=peer0.ind3.vehicle-exchange-network.com:13051
+      - CORE_PEER_LOCALMSPID=ind3MSP
+    volumes:
+        - /var/run/:/host/var/run/
+        - ../crypto-config/peerOrganizations/ind3.vehicle-exchange-network.com/peers/peer1.ind3.vehicle-exchange-network.com/msp:/etc/hyperledger/fabric/msp
+        - ../crypto-config/peerOrganizations/ind3.vehicle-exchange-network.com/peers/peer1.ind3.vehicle-exchange-network.com/tls:/etc/hyperledger/fabric/tls
+        - peer1.ind2.vehicle-exchange-network.com:/var/hyperledger/production
+    ports:
+      - 14051:14051
+      - 14053:14053
