@@ -207,15 +207,15 @@ function replacePrivateKey() {
   # The next steps will replace the template's contents with the
   # actual values of the private key file names for the two CAs.
   CURRENT_DIR=$PWD
-  cd crypto-config/peerOrganizations/carcompany.vehicle-exchange-network.com.com/ca/ || exit
+  cd crypto-config/peerOrganizations/carcompany.vehicle-exchange-network.com/ca/ || exit
   PRIV_KEY=$(ls *_sk)
   cd "$CURRENT_DIR" || exit
   sed $OPTS "s/CARCOMPANY_CA_PRIVATE_KEY/${PRIV_KEY}/g" docker-compose-e2e.yml
-  cd crypto-config/peerOrganizations/ind1.vehicle-exchange-network.com.com/ca/ || exit
+  cd crypto-config/peerOrganizations/ind1.vehicle-exchange-network.com/ca/ || exit
   PRIV_KEY=$(ls *_sk)
   cd "$CURRENT_DIR" || exit
   sed $OPTS "s/IND1_CA_PRIVATE_KEY/${PRIV_KEY}/g" docker-compose-e2e.yml
-  cd crypto-config/peerOrganizations/ind2.vehicle-exchange-network.com.com/ca/ || exit
+  cd crypto-config/peerOrganizations/ind2.vehicle-exchange-network.com/ca/ || exit
   PRIV_KEY=$(ls *_sk)
   cd "$CURRENT_DIR" || exit
   sed $OPTS "s/IND2_CA_PRIVATE_KEY/${PRIV_KEY}/g" docker-compose-e2e.yml
