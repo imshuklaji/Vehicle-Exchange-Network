@@ -1,0 +1,34 @@
+OrdererOrgs:
+  - Name: Orderer
+    Domain: vehicle-exchange-network.com
+    Specs:
+      - Hostname: orderer
+PeerOrgs:
+ - Name: carcompany
+   Domain: carcompany.vehicle-exchange-network.com
+   EnableNodeOUs: true
+   Template:
+      Count: 2
+   Users:
+      Count: 1
+ - Name: ind1
+   Domain: ind1.vehicle-exchange-network.com
+   EnableNodeOUs: true
+   Template:
+      Count: 2
+   Users:
+      Count: 1
+ - Name: ind2
+   Domain: ind2.vehicle-exchange-network.com
+   EnableNodeOUs: true
+   Template:
+      Count: 2
+   Users:
+      Count: 1  
+ - Name: ind3
+   Domain: ind3.vehicle-exchange-network.com
+   EnableNodeOUs: true
+   Template:
+      Count: 2
+   Users:
+      Count: 1  

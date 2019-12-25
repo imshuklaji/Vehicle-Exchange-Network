@@ -1,0 +1,199 @@
+Organizations:
+  - &OrdererOrg
+    Name: Orderer
+    ID: OrdererMSP
+    MSPDir: crypto-config/ordererOrganizations/vehicle-exchange-network.com/msp
+    Policies:
+      Readers:
+        Type: Signature
+        Rule: "OR('OrdererMSP.member')"
+      Writers:
+        Type: Signature
+        Rule: "OR('OrdererMSP.member')"
+      Admins:
+        Type: Signature
+        Rule: "OR('OrdererMSP.member')"
+
+  - &carcompany
+    Name: carcompanyMSP
+    ID: carcompanyMSP
+    MSPDir: crypto-config/peerOrganizations/carcompany.vehicle-exchange-network.com/msp
+    Policies:
+      Readers:
+        Type: Signature
+        Rule: "OR('carcompanyMSP.admin', 'carcompanyMSP.peer', 'carcompanyMSP.client')"
+      Writers:
+        Type: Signature
+        Rule: "OR('carcompanyMSP.admin', 'carcompanyMSP.peer', 'carcompanyMSP.client')"
+      Admins:
+        Type: Signature
+        Rule: "OR('carcompanyMSP.admin', 'carcompanyMSP.peer', 'carcompanyMSP.client')"
+    AnchorPeers:
+      - Host: peer0.carcompany.vehicle-exchange-network.com
+        Port: 7051
+
+  - &ind1
+    Name: ind1MSP
+    ID: ind1MSP
+    MSPDir: crypto-config/peerOrganizations/ind1.vehicle-exchange-network.com/msp
+    Policies:
+      Readers:
+        Type: Signature
+        Rule: "OR('ind1MSP.admin', 'ind1MSP.peer', 'ind1MSP.client')"
+      Writers:
+        Type: Signature
+        Rule: "OR('ind1MSP.admin', 'ind1MSP.peer', 'ind1MSP.client')"
+      Admins:
+        Type: Signature
+        Rule: "OR('ind1MSP.admin', 'ind1MSP.peer', 'ind1MSP.client')"
+    AnchorPeers:
+      - Host: peer0.ind1.vehicle-exchange-network.com
+        Port: 9051
+
+  - &ind2
+    Name: ind2MSP
+    ID: ind2MSP
+    MSPDir: crypto-config/peerOrganizations/ind2.vehicle-exchange-network.com/msp
+    Policies:
+      Readers:
+        Type: Signature
+        Rule: "OR('ind2MSP.admin', 'ind2MSP.peer', 'ind2MSP.client')"
+      Writers:
+        Type: Signature
+        Rule: "OR('ind2MSP.admin', 'ind2MSP.peer', 'ind2MSP.client')"
+      Admins:
+        Type: Signature
+        Rule: "OR('ind2MSP.admin', 'ind2MSP.peer', 'ind2MSP.client')"
+    AnchorPeers:
+      - Host: peer0.ind2.vehicle-exchange-network.com
+        Port: 11051
+
+
+  - &ind3
+    Name: ind3MSP
+    ID: ind3MSP
+    MSPDir: crypto-config/peerOrganizations/ind3.vehicle-exchange-network.com/msp
+    Policies:
+      Readers:
+        Type: Signature
+        Rule: "OR('ind3MSP.admin', 'ind3MSP.peer', 'ind3MSP.client')"
+      Writers:
+        Type: Signature
+        Rule: "OR('ind3MSP.admin', 'ind3MSP.peer', 'ind3MSP.client')"
+      Admins:
+        Type: Signature
+        Rule: "OR('ind3MSP.admin', 'ind3MSP.peer', 'ind3MSP.client')"
+    AnchorPeers:
+      - Host: peer0.ind3.vehicle-exchange-network.com
+        Port: 13051
+
+
+
+#Capabilities
+
+Capabilities:
+  Channel: &ChannelCapabilities
+    V1_4_3: true
+    V1_3: false
+    V1_1: false
+  Orderer: &OrdererCapabilities
+    V1_4_2: true
+    V1_1: false
+  Application: &ApplicationCapabilities
+    V1_4_2: true
+    V1_3: false
+    V1_2: false
+    V1_1: false
+
+#Application
+
+Application: &ApplicationDefaults
+  Organizations:
+  Policies: &ApplicationDefaultPolicies
+    Readers:
+      Type: ImplicitMeta
+      Rule: "ANY Readers"
+    Writers:
+      Type: ImplicitMeta
+      Rule: "ANY Writers"
+    Admins:
+      Type: ImplicitMeta
+      Rule: "ANY Admins"
+  Capabilities: *ApplicationCapabilities
+
+#Orderer
+Orderer: &OrdererDefaults
+  OrdererType: solo
+  Addresses:
+    - orderer.vehicle-exchange-network.com:7050
+  BatchTimeout: 2s
+  BatchSize:
+    MaxMessageCount: 10
+    AbsoluteMaxBytes: 99 MB
+    PreferredMaxBytes: 512 KB
+  Organizations:
+  Capabilities: *OrdererCapabilities
+  Policies:
+    Readers:
+      Type: ImplicitMeta
+      Rule: "ANY Readers"
+    Writers:
+      Type: ImplicitMeta
+      Rule: "ANY Writers"
+    Admins:
+      Type: ImplicitMeta
+      Rule: "ANY Admins"
+    # BlockValidation specifies what signatures must be included in the block
+    # from the orderer for the peer to validate it.
+    BlockValidation:
+      Type: ImplicitMeta
+      Rule: "ANY Writers"
+
+Channel: &ChannelDefaults
+  Policies:
+    # Who may invoke the 'Deliver' API
+    Readers:
+      Type: ImplicitMeta
+      Rule: "ANY Readers"
+    # Who may invoke the 'Broadcast' API
+    Writers:
+      Type: ImplicitMeta
+      Rule: "ANY Writers"
+    # By default, who may modify elements at this config level
+    Admins:
+      Type: ImplicitMeta
+      Rule: "ANY Admins"
+  Capabilities:
+    <<: *ChannelCapabilities
+
+
+#Profiles
+Profiles:
+  OrdererGenesis:
+    <<: *ChannelDefaults
+    Capabilities:
+      <<: *ChannelCapabilities
+    Orderer:
+      <<: *OrdererDefaults
+      Organizations:
+        - *OrdererOrg
+      Capabilities:
+        <<: *OrdererCapabilities
+    Consortiums:
+      VehicleExchangeConsortium:
+        Organizations:
+        - *carcompany
+        - *ind1
+        - *ind2
+        - *ind3
+  VehicleExchangeChannel:
+    Consortium: VehicleExchangeConsortium
+    Application:
+      <<: *ApplicationDefaults
+      Organizations:
+        - *carcompany
+        - *ind1
+        - *ind2
+        - *ind3
+      Capabilities:
+        <<: *ApplicationCapabilities
