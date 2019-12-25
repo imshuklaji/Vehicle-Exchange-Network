@@ -14,7 +14,7 @@ DELAY="$2"
 LANGUAGE="$3"
 TIMEOUT="$4"
 VERBOSE="$5"
-: ${CHANNEL_NAME:="registrationchannel"}
+: ${CHANNEL_NAME:="vehicleexchangechannel"}
 : ${DELAY:="5"}
 : ${LANGUAGE:="node"}
 : ${TIMEOUT:="15"}
@@ -22,7 +22,7 @@ VERBOSE="$5"
 LANGUAGE=$(echo "$LANGUAGE" | tr [:upper:] [:lower:])
 COUNTER=1
 MAX_RETRY=15
-ORGS="registrar users"  #UPDATE REQUIRED
+ORGS="carcompany ind1 ind2 ind3"  #UPDATE REQUIRED
 
 if [ "$LANGUAGE" = "node" ]; then
   CC_SRC_PATH="/opt/gopath/src/github.com/hyperledger/fabric/peer/chaincode/"
@@ -34,15 +34,15 @@ echo "Channel name : "$CHANNEL_NAME
 . scripts/utils.sh
 
 createChannel() {
-  setGlobals 0 'registrar'
+  setGlobals 0 'carcompany'
   if [ -z "$CORE_PEER_TLS_ENABLED" -o "$CORE_PEER_TLS_ENABLED" = "false" ]; then
     set -x
-    peer channel create -o orderer.property-registration-network.com:7050 -c $CHANNEL_NAME -f ./channel-artifacts/channel.tx >&log.txt
+    peer channel create -o orderer.vehicle-exchange-network.com:7050 -c $CHANNEL_NAME -f ./channel-artifacts/channel.tx >&log.txt
     res=$?
     set +x
   else
     set -x
-    peer channel create -o orderer.property-registration-network.com:7050 -c $CHANNEL_NAME -f ./channel-artifacts/channel.tx --tls $CORE_PEER_TLS_ENABLED --cafile $ORDERER_CA >&log.txt
+    peer channel create -o orderer.vehicle-exchange-network.com:7050 -c $CHANNEL_NAME -f ./channel-artifacts/channel.tx --tls $CORE_PEER_TLS_ENABLED --cafile $ORDERER_CA >&log.txt
     res=$?
     set +x
   fi
@@ -57,13 +57,12 @@ joinChannel() {
   for org in $ORGS; do
     for peer in 0 1; do
       joinChannelWithRetry $peer $org
-      echo "===================== peer${peer}.${org}.registration-network.com  joined channel '$CHANNEL_NAME' ===================== "
+      echo "===================== peer${peer}.${org}.vehicle-exchange-network.com  joined channel '$CHANNEL_NAME' ===================== "
       sleep $DELAY
       echo
     done
   done
-joinChannelWithRetry 2 users   #UPDATE REQUIRED
-      echo "===================== peer2.users.registration-network.com  joined channel '$CHANNEL_NAME' ===================== "  
+
 }
 
 ## Create channel
@@ -75,10 +74,14 @@ echo "Having all peers join the channel..."
 joinChannel
 
 ## Set the anchor peers for each org in the channel
-echo "Updating anchor peers for REGISTRAR..."
-updateAnchorPeers 0 'registrar'
-echo "Updating anchor peers for USERS..."
-updateAnchorPeers 0 'users'
+echo "Updating anchor peers for CarCompany..."
+updateAnchorPeers 0 'carcompany'
+echo "Updating anchor peers for IND1..."
+updateAnchorPeers 0 'ind1'
+echo "Updating anchor peers for IND2..."
+updateAnchorPeers 0 'ind2'
+echo "Updating anchor peers for IND3..."
+updateAnchorPeers 0 'ind3'
 
 echo
 echo "========= All GOOD, Hyperledger Fabric Property Registration Network Is Now Up and Running! =========== "

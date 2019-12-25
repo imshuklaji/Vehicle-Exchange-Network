@@ -6,15 +6,18 @@
 
 # This is a collection of bash functions used by different scripts
 
-ORDERER_CA=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/ordererOrganizations/property-registration-network.com/orderers/orderer.property-registration-network.com/msp/tlscacerts/tlsca.property-registration-network.com-cert.pem
-PEER0_REGISTRAR_CA=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/registrar.property-registration-network.com/peers/peer0.registrar.property-registration-network.com/tls/ca.crt
-PEER0_USERS_CA=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/users.property-registration-network.com/peers/peer0.users.property-registration-network.com/tls/ca.crt
+ORDERER_CA=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/ordererOrganizations/vehicle-exchange-network.com/orderers/orderer.vehicle-exchange-network.com/msp/tlscacerts/tlsca.vehicle-exchange-network.com-cert.pem
+PEER0_CARCOMPANY_CA=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/carcompany.vehicle-exchange-network.com/peers/peer0.carcompany.vehicle-exchange-network.com/tls/ca.crt
+PEER0_IND1_CA=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/ind1.vehicle-exchange-network.com/peers/peer0.ind1.vehicle-exchange-network.com/tls/ca.crt
+PEER0_IND2_CA=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/ind2.vehicle-exchange-network.com/peers/peer0.ind2.vehicle-exchange-network.com/tls/ca.crt
+PEER0_IND3_CA=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/ind3.vehicle-exchange-network.com/peers/peer0.ind3.vehicle-exchange-network.com/tls/ca.crt
+
 
 # verify the result of the end-to-end test
 verifyResult() {
   if [ "$1" -ne 0 ]; then
     echo "!!!!!!!!!!!!!!! "$2" !!!!!!!!!!!!!!!!"
-    echo "========= ERROR !!! FAILED to execute Registration Network Bootstrap ==========="
+    echo "========= ERROR !!! FAILED to execute Vehicle Exchange Network Bootstrap ==========="
     echo
     exit 1
   fi
@@ -23,36 +26,51 @@ verifyResult() {
 # Set OrdererOrg.Admin globals
 setOrdererGlobals() {
   CORE_PEER_LOCALMSPID="OrdererMSP"
-  CORE_PEER_TLS_ROOTCERT_FILE=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/ordererOrganizations/property-registration-network.com/orderers/orderer.property-registration-network.com/msp/tlscacerts/tlsca.property-registration-network.com-cert.pem
-  CORE_PEER_MSPCONFIGPATH=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/ordererOrganizations/property-registration-network.com/users/Admin@property-registration-network.com/msp
+  CORE_PEER_TLS_ROOTCERT_FILE=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/ordererOrganizations/vehicle-exchange-network.com/orderers/orderer.vehicle-exchange-network.com/msp/tlscacerts/tlsca.vehicle-exchange-network.com-cert.pem
+  CORE_PEER_MSPCONFIGPATH=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/ordererOrganizations/vehicle-exchange-network.com/users/Admin@vehicle-exchange-network.com/msp
 }
 
 setGlobals() {
   PEER=$1
   ORG=$2
-  if [ "$ORG" == 'registrar' ]; then
-    CORE_PEER_LOCALMSPID="registrarMSP"
-    CORE_PEER_TLS_ROOTCERT_FILE=$PEER0_REGISTRAR_CA
-    CORE_PEER_MSPCONFIGPATH=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/registrar.property-registration-network.com/users/Admin@registrar.property-registration-network.com/msp
+  if [ "$ORG" == 'carcompany' ]; then
+    CORE_PEER_LOCALMSPID="carcompanyMSP"
+    CORE_PEER_TLS_ROOTCERT_FILE=$PEER0_CARCOMPANY_CA
+    CORE_PEER_MSPCONFIGPATH=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/carcompany.vehicle-exchange-network.com/users/Admin@carcompany.vehicle-exchange-network.com/msp
     if [ "$PEER" -eq 0 ]; then
-      CORE_PEER_ADDRESS=peer0.registrar.property-registration-network.com:7051
+      CORE_PEER_ADDRESS=peer0.carcompany.vehicle-exchange-network.com:7051
     else
-      CORE_PEER_ADDRESS=peer1.registrar.property-registration-network.com:8051
+      CORE_PEER_ADDRESS=peer1.carcompany.vehicle-exchange-network.com:8051
     fi
-  elif [ "$ORG" == 'users' ]; then
-    CORE_PEER_LOCALMSPID="usersMSP"
-    CORE_PEER_TLS_ROOTCERT_FILE=$PEER0_USERS_CA
-    CORE_PEER_MSPCONFIGPATH=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/users.property-registration-network.com/users/Admin@users.property-registration-network.com/msp
+  elif [ "$ORG" == 'ind1' ]; then
+    CORE_PEER_LOCALMSPID="ind1MSP"
+    CORE_PEER_TLS_ROOTCERT_FILE=$PEER0_IND1_CA
+    CORE_PEER_MSPCONFIGPATH=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/ind1.vehicle-exchange-network.com/users/Admin@ind1.vehicle-exchange-network.com/msp
     if [ "$PEER" -eq 0 ]; then
-      CORE_PEER_ADDRESS=peer0.users.property-registration-network.com:9051
-    fi
-    if [ "$PEER" -eq 1 ]; then
-      CORE_PEER_ADDRESS=peer1.users.property-registration-network.com:10051
-    fi
-    if [ "$PEER" -eq 2 ]; then
-      CORE_PEER_ADDRESS=peer2.users.property-registration-network.com:11051
+      CORE_PEER_ADDRESS=peer0.ind1.vehicle-exchange-network.com:9051
+    else
+      CORE_PEER_ADDRESS=peer1.ind1.vehicle-exchange-network.com:10051
     fi
 
+  elif [ "$ORG" == 'ind2' ]; then
+    CORE_PEER_LOCALMSPID="ind2MSP"
+    CORE_PEER_TLS_ROOTCERT_FILE=$PEER0_IND2_CA
+    CORE_PEER_MSPCONFIGPATH=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/ind2.vehicle-exchange-network.com/users/Admin@ind2.vehicle-exchange-network.com/msp
+    if [ "$PEER" -eq 0 ]; then
+      CORE_PEER_ADDRESS=peer0.ind2.vehicle-exchange-network.com:11051
+    else
+      CORE_PEER_ADDRESS=peer1.ind2.vehicle-exchange-network.com:12051
+    fi
+
+  elif [ "$ORG" == 'ind3' ]; then
+    CORE_PEER_LOCALMSPID="ind3MSP"
+    CORE_PEER_TLS_ROOTCERT_FILE=$PEER0_IND3_CA
+    CORE_PEER_MSPCONFIGPATH=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/ind3.vehicle-exchange-network.com/users/Admin@ind3.vehicle-exchange-network.com/msp
+    if [ "$PEER" -eq 0 ]; then
+      CORE_PEER_ADDRESS=peer0.ind3.vehicle-exchange-network.com:11051
+    else
+      CORE_PEER_ADDRESS=peer1.ind3.vehicle-exchange-network.com:12051
+    fi
   else
     echo "================== ERROR !!! ORG Unknown =================="
   fi
@@ -65,12 +83,12 @@ updateAnchorPeers() {
 
   if [ -z "$CORE_PEER_TLS_ENABLED" -o "$CORE_PEER_TLS_ENABLED" = "false" ]; then
     set -x
-    peer channel update -o orderer.property-registration-network.com:7050 -c "$CHANNEL_NAME" -f ./channel-artifacts/${CORE_PEER_LOCALMSPID}anchors.tx >&log.txt
+    peer channel update -o orderer.vehicle-exchange-network.com:7050 -c "$CHANNEL_NAME" -f ./channel-artifacts/${CORE_PEER_LOCALMSPID}anchors.tx >&log.txt
     res=$?
     set +x
   else
     set -x
-    peer channel update -o orderer.property-registration-network.com:7050 -c "$CHANNEL_NAME" -f ./channel-artifacts/${CORE_PEER_LOCALMSPID}anchors.tx --tls "$CORE_PEER_TLS_ENABLED" --cafile $ORDERER_CA >&log.txt
+    peer channel update -o orderer.vehicle-exchange-network.com:7050 -c "$CHANNEL_NAME" -f ./channel-artifacts/${CORE_PEER_LOCALMSPID}anchors.tx --tls "$CORE_PEER_TLS_ENABLED" --cafile $ORDERER_CA >&log.txt
     res=$?
     set +x
   fi
@@ -109,7 +127,7 @@ installChaincode() {
   setGlobals "$PEER" "$ORG"
   VERSION=${3:-1.0}
   set -x
-  peer chaincode install -n regnet -v "${VERSION}" -l "${LANGUAGE}" -p "${CC_SRC_PATH}" >&log.txt
+  peer chaincode install -n vexnet -v "${VERSION}" -l "${LANGUAGE}" -p "${CC_SRC_PATH}" >&log.txt
   res=$?
   set +x
   cat log.txt
@@ -129,12 +147,12 @@ instantiateChaincode() {
   # the "-o" option
   if [ -z "$CORE_PEER_TLS_ENABLED" -o "$CORE_PEER_TLS_ENABLED" = "false" ]; then
     set -x
-    peer chaincode instantiate -o orderer.property-registration-network.com:7050 -C "$CHANNEL_NAME" -n regnet -l "${LANGUAGE}" -v "${VERSION}" -c '{"Args":["org.property-registration-network.regnet-users:instantiate"]}' -P "OR ('registrarMSP.member','usersMSP.member')" >&log.txt
+    peer chaincode instantiate -o orderer.vehicle-exchange-network.com:7050 -C "$CHANNEL_NAME" -n vexnet -l "${LANGUAGE}" -v "${VERSION}" -c '{"Args":["org.vehicle-exchange-network.vexnet:instantiate"]}' -P "OR ('carcompanyMSP.member','ind1MSP.member','ind2MSP.member','ind3MSP.member')" >&log.txt
     res=$?
     set +x
   else
     set -x
-    peer chaincode instantiate -o orderer.property-registration-network.com:7050 --tls "$CORE_PEER_TLS_ENABLED" --cafile $ORDERER_CA -C $CHANNEL_NAME -n regnet -l ${LANGUAGE} -v ${VERSION} -c '{"Args":["org.property-registration-network.regnet-users:instantiate"]}' -P "OR ('registrarMSP.member','usersMSP.member')" >&log.txt
+    peer chaincode instantiate -o orderer.vehicle-exchange-network.com:7050 --tls "$CORE_PEER_TLS_ENABLED" --cafile $ORDERER_CA -C $CHANNEL_NAME -n vexnet -l ${LANGUAGE} -v ${VERSION} -c '{"Args":["org.vehicle-exchange-network.vexnet:instantiate"]}' -P "OR ('carcompanyMSP.member','ind1MSP.member','ind2MSP.member','ind3MSP.member')" >&log.txt
     res=$?
     set +x
   fi
@@ -144,7 +162,7 @@ instantiateChaincode() {
   echo
 }
 
-upgradeChaincode() {
+updateChaincode() {
   PEER=$1
   ORG=$2
   setGlobals $PEER $ORG
@@ -152,18 +170,18 @@ upgradeChaincode() {
 
   if [ -z "$CORE_PEER_TLS_ENABLED" -o "$CORE_PEER_TLS_ENABLED" = "false" ]; then
     set -x
-    peer chaincode upgrade -o orderer.property-registration-network.com:7050 -C $CHANNEL_NAME -n regnet -l ${LANGUAGE} -v ${VERSION} -p ${CC_SRC_PATH} -c '{"Args":["org.property-registration-network.regnet:instantiate"]}' -P "OR ('registrarMSP.member','usersMSP.member','upgradMSP.member')" >&log.txt
+    peer chaincode upgrade -o orderer.vehicle-exchange-network.com:7050 -C $CHANNEL_NAME -n vexnet -l ${LANGUAGE} -v ${VERSION} -p ${CC_SRC_PATH} -c '{"Args":["org.vehicle-exchange-network.vexnet:instantiate"]}' -P "OR ('carcompanyMSP.member','ind1MSP.member','ind2MSP.member','ind3MSP.member')" >&log.txt
     res=$?
     set +x
   else
     set -x
-    peer chaincode upgrade -o orderer.property-registration-network.com:7050 --tls $CORE_PEER_TLS_ENABLED --cafile $ORDERER_CA -C $CHANNEL_NAME -n regnet -l ${LANGUAGE} -v ${VERSION} -p ${CC_SRC_PATH} -c '{"Args":["org.property-registration-network.regnet:instantiate"]}' -P "OR ('registrarMSP.member','usersMSP.member','upgradMSP.member')" >&log.txt
+    peer chaincode upgrade -o orderer.vehicle-exchange-network.com:7050 --tls $CORE_PEER_TLS_ENABLED --cafile $ORDERER_CA -C $CHANNEL_NAME -n vexnet -l ${LANGUAGE} -v ${VERSION} -p ${CC_SRC_PATH} -c '{"Args":["org.vehicle-exchange-network.vexnet:instantiate"]}' -P "OR ('carcompanyMSP.member','ind1MSP.member','ind2MSP.member','ind3MSP.member')" >&log.txt
     res=$?
     set +x
   fi
   cat log.txt
   verifyResult $res "Chaincode upgrade on peer${PEER}.${ORG} has failed"
-  echo "===================== Chaincode is upgraded on peer${PEER}.${ORG} on channel '$CHANNEL_NAME' ===================== "
+  echo "===================== Chaincode is ind2ed on peer${PEER}.${ORG} on channel '$CHANNEL_NAME' ===================== "
   echo
 }
 
@@ -184,7 +202,7 @@ chaincodeQuery() {
     sleep $DELAY
     echo "Attempting to Query peer${PEER}.${ORG} ...$(($(date +%s) - starttime)) secs"
     set -x
-    peer chaincode query -C $CHANNEL_NAME -n regnet -c '{"Args":["org.property-registration-network.regnet:instantiate"]}' >&log.txt
+    peer chaincode query -C $CHANNEL_NAME -n vexnet -c '{"Args":["org.vehicle-exchange-network.vexnet:instantiate"]}' >&log.txt
     res=$?
     set +x
     test $res -eq 0 && VALUE=$(cat log.txt | awk '/Query Result/ {print $NF}')
@@ -219,12 +237,12 @@ chaincodeInvoke() {
   # it using the "-o" option
   if [ -z "$CORE_PEER_TLS_ENABLED" -o "$CORE_PEER_TLS_ENABLED" = "false" ]; then
     set -x
-    peer chaincode invoke -o orderer.property-registration-network.com:7050 -C $CHANNEL_NAME -n regnet $PEER_CONN_PARMS -c '{"Args":["org.property-registration-network.regnet:createStudent","0001","Aakash Bansal","connect@aakashbansal.com","15"]}' >&log.txt
+    peer chaincode invoke -o orderer.vehicle-exchange-network.com:7050 -C $CHANNEL_NAME -n vexnet $PEER_CONN_PARMS -c '{"Args":["org.vehicle-exchange-network.vexnet:createStudent","0001","Aakash Bansal","connect@aakashbansal.com","15"]}' >&log.txt
     res=$?
     set +x
   else
     set -x
-    peer chaincode invoke -o orderer.property-registration-network.com:7050 --tls $CORE_PEER_TLS_ENABLED --cafile $ORDERER_CA -C $CHANNEL_NAME -n regnet $PEER_CONN_PARMS -c '{"Args":["org.property-registration-network.regnet:createStudent","0001","Aakash Bansal","connect@aakashbansal.com"]}' >&log.txt
+    peer chaincode invoke -o orderer.vehicle-exchange-network.com:7050 --tls $CORE_PEER_TLS_ENABLED --cafile $ORDERER_CA -C $CHANNEL_NAME -n vexnet $PEER_CONN_PARMS -c '{"Args":["org.vehicle-exchange-network.vexnet:createStudent","0001","Aakash Bansal","connect@aakashbansal.com"]}' >&log.txt
     res=$?
     set +x
   fi

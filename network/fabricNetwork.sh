@@ -16,7 +16,7 @@ function printHelp() {
   echo "      - 'install' - install and instantiate a specific version of chaincode"
   echo "      - 'update' - update chaincode to a new version"
   echo "      - 'generate' - generate required certificates and genesis block"
-  echo "    -c <channel name> - channel name to use (defaults to \"registrationchannel\")"
+  echo "    -c <channel name> - channel name to use (defaults to \"vehicleexchangechannel\")"
   echo "    -t <timeout> - CLI timeout duration in seconds (defaults to 20)"
   echo "    -d <delay> - delay duration in seconds (defaults to 20)"
   echo "    -f <docker-compose-file> - specify which docker-compose file use (defaults to docker-compose-e2e.yaml)"
@@ -29,11 +29,11 @@ function printHelp() {
   echo "Typically, one would first generate the required certificates and "
   echo "genesis block, then bring up the network. e.g.:"
   echo
-  echo "	fabricNetwork.sh generate -c registrationchannel"
-  echo "	fabricNetwork up -c registrationchannel -s couchdb"
-  echo "        fabricNetwork up -c registrationchannel -s couchdb -i 1.4.0"
+  echo "	fabricNetwork.sh generate -c vehicleexchangechannel"
+  echo "	fabricNetwork up -c vehicleexchangechannel -s couchdb"
+  echo "        fabricNetwork up -c vehicleexchangechannel -s couchdb -i 1.4.0"
   echo "	fabricNetwork up -l node"
-  echo "	fabricNetwork down -c registrationchannel"
+  echo "	fabricNetwork down -c vehicleexchangechannel"
   echo
   echo "Taking all defaults:"
   echo "	fabricNetwork generate"
@@ -176,7 +176,7 @@ function networkDown() {
   if [ "$MODE" != "restart" ]; then
     # Bring down the network, deleting the volumes
     # Delete any ledger backups
-    docker run -v "$PWD":/tmp/registrationchannel --rm hyperledger/fabric-tools:"$IMAGETAG" rm -Rf /tmp/registrationchannel/ledgers-backup
+    docker run -v "$PWD":/tmp/vehicleexchangechannel --rm hyperledger/fabric-tools:"$IMAGETAG" rm -Rf /tmp/vehicleexchangechannel/ledgers-backup
     #Cleanup the chaincode containers
     clearContainers
     #Cleanup images
@@ -207,19 +207,25 @@ function replacePrivateKey() {
   # The next steps will replace the template's contents with the
   # actual values of the private key file names for the two CAs.
   CURRENT_DIR=$PWD
-  cd crypto-config/peerOrganizations/registrar.property-registration-network.com/ca/ || exit
+  cd crypto-config/peerOrganizations/carcompany.vehicle-exchange-network.com.com/ca/ || exit
   PRIV_KEY=$(ls *_sk)
   cd "$CURRENT_DIR" || exit
-  sed $OPTS "s/REGISTRAR_CA_PRIVATE_KEY/${PRIV_KEY}/g" docker-compose-e2e.yml
-  cd crypto-config/peerOrganizations/users.property-registration-network.com/ca/ || exit
+  sed $OPTS "s/CARCOMPANY_CA_PRIVATE_KEY/${PRIV_KEY}/g" docker-compose-e2e.yml
+  cd crypto-config/peerOrganizations/ind1.vehicle-exchange-network.com.com/ca/ || exit
   PRIV_KEY=$(ls *_sk)
   cd "$CURRENT_DIR" || exit
-  sed $OPTS "s/USERS_CA_PRIVATE_KEY/${PRIV_KEY}/g" docker-compose-e2e.yml
-  
-  # cd crypto-config/peerOrganizations/upgrad.property-registration-network.com/ca/ || exit
-  # PRIV_KEY=$(ls *_sk)
-  # cd "$CURRENT_DIR" || exit
-  # sed $OPTS "s/UPGRAD_CA_PRIVATE_KEY/${PRIV_KEY}/g" docker-compose-e2e.yml
+  sed $OPTS "s/IND1_CA_PRIVATE_KEY/${PRIV_KEY}/g" docker-compose-e2e.yml
+  cd crypto-config/peerOrganizations/ind2.vehicle-exchange-network.com.com/ca/ || exit
+  PRIV_KEY=$(ls *_sk)
+  cd "$CURRENT_DIR" || exit
+  sed $OPTS "s/IND2_CA_PRIVATE_KEY/${PRIV_KEY}/g" docker-compose-e2e.yml
+  cd crypto-config/peerOrganizations/ind3.certification-network.com/ca/ || exit
+  PRIV_KEY=$(ls *_sk)
+  cd "$CURRENT_DIR" || exit
+  sed $OPTS "s/IND3_CA_PRIVATE_KEY/${PRIV_KEY}/g" docker-compose-e2e.yml
+
+
+
   # If MacOSX, remove the temporary backup of the docker-compose file
   if [ "$ARCH" == "Darwin" ]; then
     rm docker-compose-e2e.yml
@@ -269,7 +275,7 @@ function generateChannelArtifacts() {
   # Note: For some unknown reason (at least for now) the block file can't be
   # named orderer.genesis.block or the orderer will fail to launch!
   set -x
-  configtxgen -profile OrdererGenesis -channelID upgrad-sys-channel -outputBlock ./channel-artifacts/genesis.block
+  configtxgen -profile OrdererGenesis -channelID vehicleexchangechannel -outputBlock ./channel-artifacts/genesis.block
   res=$?
   set +x
   if [ $res -ne 0 ]; then
@@ -281,7 +287,7 @@ function generateChannelArtifacts() {
   echo "### Generating channel configuration transaction 'channel.tx' ###"
   echo "#################################################################"
   set -x
-  configtxgen -profile RegistrationChannel -outputCreateChannelTx ./channel-artifacts/channel.tx -channelID "$CHANNEL_NAME"
+  configtxgen -profile vehicleexchangechannel -outputCreateChannelTx ./channel-artifacts/channel.tx -channelID "$CHANNEL_NAME"
   res=$?
   set +x
   if [ $res -ne 0 ]; then
@@ -291,45 +297,58 @@ function generateChannelArtifacts() {
 
   echo
   echo "#################################################################"
-  echo "#######    Generating anchor peer update for registrarMSP   ##########"
+  echo "#######    Generating anchor peer update for carcompanyMSP   ##########"
   echo "#################################################################"
   set -x
-  configtxgen -profile RegistrationChannel -outputAnchorPeersUpdate ./channel-artifacts/registrarMSPanchors.tx -channelID "$CHANNEL_NAME" -asOrg registrarMSP
+  configtxgen -profile vehicleexchangechannel -outputAnchorPeersUpdate ./channel-artifacts/carcompanyMSPanchors.tx -channelID "$CHANNEL_NAME" -asOrg carcompanyMSP
   res=$?
   set +x
   if [ $res -ne 0 ]; then
-    echo "Failed to generate anchor peer update for registrar..."
+    echo "Failed to generate anchor peer update for carcompany..."
     exit 1
   fi
 
   echo
   echo "#################################################################"
-  echo "#######    Generating anchor peer update for usersMSP   ##########"
+  echo "#######    Generating anchor peer update for ind1MSP   ##########"
   echo "#################################################################"
   set -x
-  configtxgen -profile RegistrationChannel -outputAnchorPeersUpdate ./channel-artifacts/usersMSPanchors.tx -channelID "$CHANNEL_NAME" -asOrg usersMSP
+  configtxgen -profile vehicleexchangechannel -outputAnchorPeersUpdate ./channel-artifacts/ind1MSPanchors.tx -channelID "$CHANNEL_NAME" -asOrg ind1MSP
   res=$?
   set +x
   if [ $res -ne 0 ]; then
-    echo "Failed to generate anchor peer update for users..."
+    echo "Failed to generate anchor peer update for ind1..."
     exit 1
   fi
   echo
 
-  # echo
-  # echo "#################################################################"
-  # echo "#######    Generating anchor peer update for upgradMSP   ##########"
-  # echo "#################################################################"
-  # set -x
-  # configtxgen -profile RegistrationChannel -outputAnchorPeersUpdate ./channel-artifacts/upgradMSPanchors.tx -channelID "$CHANNEL_NAME" -asOrg upgradMSP
-  # res=$?
-  # set +x
-  # if [ $res -ne 0 ]; then
-  #   echo "Failed to generate anchor peer update for UPGRAD..."
-  #   exit 1
-  # fi
-  # echo
+  echo
+  echo "#################################################################"
+  echo "#######    Generating anchor peer update for ind2MSP   ##########"
+  echo "#################################################################"
+  set -x
+  configtxgen -profile vehicleexchangechannel -outputAnchorPeersUpdate ./channel-artifacts/ind2MSPanchors.tx -channelID "$CHANNEL_NAME" -asOrg ind2MSP
+  res=$?
+  set +x
+  if [ $res -ne 0 ]; then
+    echo "Failed to generate anchor peer update for ind2..."
+    exit 1
+  fi
+  echo
 
+  echo
+  echo "#################################################################"
+  echo "#######    Generating anchor peer update for ind3MSP   ##########"
+  echo "#################################################################"
+  set -x
+  configtxgen -profile vehicleexchangechannel -outputAnchorPeersUpdate ./channel-artifacts/ind3MSPanchors.tx -channelID "$CHANNEL_NAME" -asOrg ind3MSP
+  res=$?
+  set +x
+  if [ $res -ne 0 ]; then
+    echo "Failed to generate anchor peer update for ind3..."
+    exit 1
+  fi
+  echo
 }
 
 # timeout duration - the duration the CLI should wait for a response from
@@ -337,8 +356,8 @@ function generateChannelArtifacts() {
 CLI_TIMEOUT=15
 # default for delay between commands
 CLI_DELAY=5
-# channel name defaults to "registrationchannel"
-CHANNEL_NAME="registrationchannel"
+# channel name defaults to "vehicleexchangechannel"
+CHANNEL_NAME="vehicleexchangechannel"
 # version for updating chaincode
 VERSION_NO=1.0
 # type of chaincode to be installed
