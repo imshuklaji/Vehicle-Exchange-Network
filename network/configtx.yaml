@@ -186,7 +186,7 @@ Profiles:
         - *ind1
         - *ind2
         - *ind3
-  VehicleExchangeChannel:
+  vehicleexchangechannel:
     Consortium: VehicleExchangeConsortium
     Application:
       <<: *ApplicationDefaults

@@ -219,7 +219,7 @@ function replacePrivateKey() {
   PRIV_KEY=$(ls *_sk)
   cd "$CURRENT_DIR" || exit
   sed $OPTS "s/IND2_CA_PRIVATE_KEY/${PRIV_KEY}/g" docker-compose-e2e.yml
-  cd crypto-config/peerOrganizations/ind3.certification-network.com/ca/ || exit
+  cd crypto-config/peerOrganizations/ind3.vehicle-exchange-network.com/ca/ || exit
   PRIV_KEY=$(ls *_sk)
   cd "$CURRENT_DIR" || exit
   sed $OPTS "s/IND3_CA_PRIVATE_KEY/${PRIV_KEY}/g" docker-compose-e2e.yml
