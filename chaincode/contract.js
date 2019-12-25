@@ -42,7 +42,14 @@ class VexnetContract extends Contract {
 
 	/* Below set of the functions are for the Car Company ****** */
 
-	
+	// Register car company on the network
+	async function registerCompany (companyCRN, companyName, Location, organisationRole){
+
+	}
+
+
+
+
 	// Register the new car on the network
 
 	 async function addCar(ctx,carSerialNo,carModelName,mfgDate,companyCRN) {
@@ -63,4 +70,44 @@ class VexnetContract extends Contract {
 
 	 }
 
+
+	 /* Below set of the functions are for the Individuals ****** */
+
+
+	 async function carSaleOrder(){
+
+	 }
+
+
+	 async function viewCarWithCompany(){
+
+	 }
+
+
+	 async function viewCarAvailableForSale(){
+
+	 }
+
+
+	 async function viewCarOwnershipTransferHistory(){
+
+	 }
+
+	 async function createPurchaseOrder(){
+
+	 }
+
+
+	 async function viewPurchaseRequestsforOwnCar(){
+
+	 }
+
+
+
+	 async function purchaseReqeustApprovalRejection(){
+
+	 }
+
+
+	 module.exports = VexnetContract;
 }
