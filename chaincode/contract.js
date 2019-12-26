@@ -290,21 +290,21 @@ class VexnetContract extends Contract {
 	 }
 
 
-	 async function viewCarOwnershipTransferHistory(){
+	 
+	 async function createPurchaseOrder(ctx,buyerName,buyerAdhar,carName,amount,carSerialNo){
 
-	 }
-
-
-	 async function createPurchaseOrder(ctx,buyerCRN,carName,amount,carSerialNo){
-
-	 	const purchaseKey = ctx.stub.createCompositeKey('org.vehicle-exchange-network.purchase-order', [buyerCRN+'-'+carName]);
-		const buyerKey = ctx.stub.createCompositeKey('org.pharma-network.pharmanet.company', [buyerCRN]);
+	 	const purchaseKey = ctx.stub.createCompositeKey('org.vehicle-exchange-network.purchase-order', [buyerName+'-'+buyerAdhar+'-'+carName]);
+		const buyerKey = ctx.stub.createCompositeKey('org.vehicle-exchange-network.company', [buyerName+'-'+buyerAdhar]);
 
 		let newPOObj = {
 			poId : purchaseKey,
 			carName : carName,
+			carSerialNo:carSerialNo,
 			carSerialNo : carSerialNo,
-			buyer : buyerKey,
+			buyerId : buyerKey,
+			buyerName : buyerName,
+			purchaseAmount : amount,
+			status:'open',
 			createdAt: new Date(),
 			updatedAt: new Date(),
 		};		
@@ -320,21 +320,106 @@ class VexnetContract extends Contract {
 	 }
 
 
-	 async function viewPurchaseRequestsforOwnCar(){
+	 async function viewPurchaseRequestsforOwnCar(ctx,name,aadharNo,listofOrders){
+
+	 	const userKey = ctx.stub.createCompositeKey('org.vehicle-exchange-network.com.users', [name,aadharNo]);
+
+	 	let ownCarOrders = [];
+
+	 	forEach(order : listofOrders) {
+
+	 		const productKey = ctx.stub.createCompositeKey('vehicle-exchange-network.com.car', [order.carSerialNo]);
+	 		let carBuffer = await ctx.stub
+				.getState(productKey)
+				.catch(err => console.log(err));
+			
+
+			let carObject = JSON.parse(carBuffer.toString());
+
+			if(carObject.ownerKey == userKey) 
+				ownCarOrders.push(order.poId);
+
+	 	}
+
+	 	return ownCarOrders;
+	}
 
 
 
+	 async function purchaseReqeustApprovalRejection(ctx,buyerName,buyerAdhar,name,aadharNo,carName,carSerialNo){
 
+	 	const productKey = ctx.stub.createCompositeKey('org.vehicle-exchange-network.com.car',[carSerialNo]);
+	 	const userKey = ctx.stub.createCompositeKey('org.vehicle-exchange-network.com.users', [name,aadharNo]);
+	 	const purchaseKey = ctx.stub.createCompositeKey('org.vehicle-exchange-network.purchase-order', [buyerName+'-'+buyerAdhar+'-'+carName]);
+	 	const buyerKey = ctx.stub.createCompositeKey('org.vehicle-exchange-network.users', [buyerName+'-'+buyerAdhar]);
+	 	let purchaseOrderBuffer = await ctx.stub
+				.getState(purchaseKey)
+				.catch(err => console.log(err));
+			
+
+		let purchaseObject = JSON.parse(purchaseOrderBuffer.toString());
+
+
+		let carBuffer = await ctx.stub
+				.getState(productKey)
+				.catch(err => console.log(err));
+			
+
+			let carObject = JSON.parse(carBuffer.toString());
+
+
+
+		if ((carObject.status === 'for-sale') && (carObject.ownerKey == userKey ) && 
+			(purchaseObject.amount >= 50000) && (purchaseObject.status === 'open')) {
+
+			//change the values of the respestive car object and purchase order
+
+			purchaseObject.status = 'closed';
+			carObject.ownerKey = buyerKey;
+			carObject.owner: buyerName;
+			carObject.status : 'registered';
+			carObject.salePrice : purchaseObject.purchaseAmount;
+			carObject.transferHistory.push(buyerKey) ;
+
+			//save the changed values
+
+			let dataBuffer = Buffer.from(JSON.stringify(carObject));
+			await ctx.stub.putState(productKey, dataBuffer);
+
+			let dataBuffer2 = Buffer.from(JSON.stringify(purchaseObject));
+			await ctx.stub.putState(purchaseKey, dataBuffer2);
+
+		}
+
+
+	}
+
+
+
+	async function viewCarOwnershipTransferHistory(ctx,carSerialNo){
+
+	const productKey = ctx.stub.createCompositeKey('org.vehicle-exchange-network.com.car',[carSerialNo]);
+
+	//return the history as per the product key all transfer 
+		return await this.ctx.stub.getHistoryForKey(productKey);
+
+	/*
+
+	let carBuffer = await ctx.stub
+				.getState(productKey)
+				.catch(err => console.log(err));
+			
+
+	let carObject = JSON.parse(carBuffer.toString());
+
+	return carObject.transferHistory;
+
+	*/
 
 
 	 }
 
 
-
-	 async function purchaseReqeustApprovalRejection(){
-
-	 }
-
-
+	 
 	 module.exports = VexnetContract;
 }
