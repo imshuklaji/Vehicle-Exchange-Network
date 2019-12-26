@@ -81,14 +81,17 @@ class VexnetContract extends Contract {
 
 		//Fetch the company details saved on the ledger and then use that object to register the company name for car
 
-		let companyBuffer= await ctx.stub.getState(propertyKey).catch(err => console.log(err));
-		let companyObject= JSON.parse(propertyBuffer.toString());
+		let companyBuffer= await ctx.stub.getState(companyKey).catch(err => console.log(err));
+		let companyObject= JSON.parse(companyBuffer.toString());
 
 		let newCarObj = {
 			productId : productKey,
-			carName : carName,
+			carModelName : carModelName,
 			manufacturer : companyKey
-			owner : companyObject.companyName,
+			ownerKey : companyKey,
+			owner: companyObject.companyName,
+			status : 'registered', 
+			salePrice:'',
 			transferHistory : companyKey,  // variable which will be used to track the transfer of the car ownership
 			createdAt: new Date(),
 			updatedAt: new Date(),
@@ -118,6 +121,7 @@ class VexnetContract extends Contract {
 			aadharNo: aadharNo,
 			phone: phone,
 			location : location,
+			carsOwned:'',
 			createdAt: new Date()
 		};
 		// Convert the JSON object to a buffer and send it to blockchain for storage
@@ -156,6 +160,7 @@ class VexnetContract extends Contract {
 
 	let userObject = JSON.parse(userBuffer.toString());
 
+	carObject.ownerKey = userKey;
 	carObject.owner = userObject.name; //change the ownership to username 
 	carObject.transferHistory.push(userKey); // push the userkey in transfer history object
 
@@ -187,17 +192,100 @@ class VexnetContract extends Contract {
 	 /* Below set of the functions are for the Individuals ****** */
 
 
-	 async function carSaleOrder(){
+	 async function carSaleOrder(ctx,carSerialNo,name, aadharNo){
 
+	 const userKey = ctx.stub.createCompositeKey('org.vehicle-exchange-network.com.users', [name,aadharNo]);
+	 const productKey = ctx.stub.createCompositeKey('vehicle-exchange-network.com.car', [carSerialNo]);
+
+	 // First fetch the details of the user and the car and then save the updated owner 
+
+	 let carBuffer = await ctx.stub
+				.getState(productKey)
+				.catch(err => console.log(err));
+			
+
+	let carObject = JSON.parse(carBuffer.toString());
+
+	let userBuffer = await ctx.stub
+				.getState(userKey)
+				.catch(err => console.log(err));
+
+
+
+	if (userBuffer.length === 0)
+			throw new Error('User: '+ name + ' with Aadhar Number: '+ aadharNo + 'not registered on the vehicle-exchange-network');
+
+	if (carBuffer.length === 0)
+			throw new Error('Car with carSerialNo: '+ carSerialNo + 'not registered on the vehicle-exchange-network');
+
+	//fetch the details of the car with car-serial-no owned by this user and register it for sale
+	if (carObject.ownerKey == userKey)
+		{
+			carObject.status = 'for-sale';
+			carObject.salePrice = 500000;
+			let dataBuffer = Buffer.from(JSON.stringify(carObject));
+			await ctx.stub.putState(productKey, dataBuffer);
+		}
+		else{
+
+			throw new Error('User: '+ name + ' with Aadhar Number: '+ aadharNo + 'not authorised to make this transaction');
+		}
+
+	}
+
+
+
+
+	 async function viewCarsWithCompany(ctx,companyCRN,listofCars){
+
+	 	const companyKey = ctx.stub.createCompositeKey('vehicle-exchange-network.com.company', [companyCRN]);
+
+	 	let carswithCompanyArray =[];
+
+
+	 	forEach(car : listofCars) {
+
+	 		const productKey = ctx.stub.createCompositeKey('vehicle-exchange-network.com.car', [car.carSerialNo]);
+	 		let carBuffer = await ctx.stub
+				.getState(productKey)
+				.catch(err => console.log(err));
+			
+
+			let carObject = JSON.parse(carBuffer.toString());
+
+			if ( carObject.ownerKey == companyKey)
+				carswithCompanyArray.push(productKey);
+
+
+	 	}
+	 	
+	 	//return the array containing the list of the cars with company
+	 	return carswithCompanyArray;
+
+	 
 	 }
 
 
-	 async function viewCarWithCompany(){
+	 async function viewCarAvailableForSale(ctx,listofCars){
 
-	 }
+	 	let saleCarArray=[];
 
+	 	forEach(car : listofCars) {
+	 		const productKey = ctx.stub.createCompositeKey('vehicle-exchange-network.com.car', [car.carSerialNo]);
+	 		let carBuffer = await ctx.stub
+				.getState(productKey)
+				.catch(err => console.log(err));
+			
 
-	 async function viewCarAvailableForSale(){
+			let carObject = JSON.parse(carBuffer.toString());
+
+			if ( carObject.status === 'for-sale')
+				saleCarArray.push(productKey);
+
+	 	}
+
+	 	//return the array containing the list of the cars with status for-sale
+	 	return saleCarArray;
 
 	 }
 
@@ -206,12 +294,38 @@ class VexnetContract extends Contract {
 
 	 }
 
-	 async function createPurchaseOrder(){
+
+	 async function createPurchaseOrder(ctx,buyerCRN,carName,amount,carSerialNo){
+
+	 	const purchaseKey = ctx.stub.createCompositeKey('org.vehicle-exchange-network.purchase-order', [buyerCRN+'-'+carName]);
+		const buyerKey = ctx.stub.createCompositeKey('org.pharma-network.pharmanet.company', [buyerCRN]);
+
+		let newPOObj = {
+			poId : purchaseKey,
+			carName : carName,
+			carSerialNo : carSerialNo,
+			buyer : buyerKey,
+			createdAt: new Date(),
+			updatedAt: new Date(),
+		};		
+
+		let dataBuffer = Buffer.from(JSON.stringify(newPOObj));
+		await ctx.stub.putState(purchaseKey, dataBuffer);
+		return newPOObj;
+
+
+
+
 
 	 }
 
 
 	 async function viewPurchaseRequestsforOwnCar(){
+
+
+
+
+
 
 	 }
 
