@@ -22,7 +22,7 @@ VERBOSE="$5"
 LANGUAGE=$(echo "$LANGUAGE" | tr [:upper:] [:lower:])
 COUNTER=1
 MAX_RETRY=15
-ORGS="carcompany ind1 ind2 ind3"  #UPDATE REQUIRED
+ORGS="manufacturer individual1 individual2 individual3"
 
 if [ "$LANGUAGE" = "node" ]; then
   CC_SRC_PATH="/opt/gopath/src/github.com/hyperledger/fabric/peer/chaincode/"
@@ -34,7 +34,7 @@ echo "Channel name : "$CHANNEL_NAME
 . scripts/utils.sh
 
 createChannel() {
-  setGlobals 0 'carcompany'
+  setGlobals 0 'manufacturer'
   if [ -z "$CORE_PEER_TLS_ENABLED" -o "$CORE_PEER_TLS_ENABLED" = "false" ]; then
     set -x
     peer channel create -o orderer.vehicle-exchange-network.com:7050 -c $CHANNEL_NAME -f ./channel-artifacts/channel.tx >&log.txt
@@ -62,7 +62,6 @@ joinChannel() {
       echo
     done
   done
-
 }
 
 ## Create channel
@@ -74,17 +73,19 @@ echo "Having all peers join the channel..."
 joinChannel
 
 ## Set the anchor peers for each org in the channel
-echo "Updating anchor peers for CarCompany..."
-updateAnchorPeers 0 'carcompany'
-echo "Updating anchor peers for IND1..."
-updateAnchorPeers 0 'ind1'
-echo "Updating anchor peers for IND2..."
-updateAnchorPeers 0 'ind2'
-echo "Updating anchor peers for IND3..."
-updateAnchorPeers 0 'ind3'
+echo "Updating anchor peers for manufacturer..."
+updateAnchorPeers 0 'manufacturer'
+echo "Updating anchor peers for individual1..."
+updateAnchorPeers 0 'individual1'
+echo "Updating anchor peers for individual2..."
+updateAnchorPeers 0 'individual2'
+echo "Updating anchor peers for individual3..."
+updateAnchorPeers 0 'individual3'
+
+
 
 echo
-echo "========= All GOOD, Hyperledger Fabric Property Registration Network Is Now Up and Running! =========== "
+echo "========= All GOOD, Hyperledger Fabric Vehicle Exchange Network Is Now Up and Running! =========== "
 echo
 
 echo

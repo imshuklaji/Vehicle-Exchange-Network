@@ -4,31 +4,32 @@ OrdererOrgs:
     Specs:
       - Hostname: orderer
 PeerOrgs:
- - Name: carcompany
-   Domain: carcompany.vehicle-exchange-network.com
+ - Name: manufacturer
+   Domain: manufacturer.vehicle-exchange-network.com
    EnableNodeOUs: true
    Template:
       Count: 2
    Users:
       Count: 1
- - Name: ind1
-   Domain: ind1.vehicle-exchange-network.com
+ - Name: individual1
+   Domain: individual1.vehicle-exchange-network.com
    EnableNodeOUs: true
    Template:
       Count: 2
    Users:
       Count: 1
- - Name: ind2
-   Domain: ind2.vehicle-exchange-network.com
+ - Name: individual2
+   Domain: individual2.vehicle-exchange-network.com
    EnableNodeOUs: true
    Template:
       Count: 2
    Users:
-      Count: 1  
- - Name: ind3
-   Domain: ind3.vehicle-exchange-network.com
+      Count: 1
+ - Name: individual3
+   Domain: individual3.vehicle-exchange-network.com
    EnableNodeOUs: true
    Template:
       Count: 2
    Users:
-      Count: 1  
+      Count: 1
+ 

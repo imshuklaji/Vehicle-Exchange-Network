@@ -14,80 +14,79 @@ Organizations:
         Type: Signature
         Rule: "OR('OrdererMSP.member')"
 
-  - &carcompany
-    Name: carcompanyMSP
-    ID: carcompanyMSP
-    MSPDir: crypto-config/peerOrganizations/carcompany.vehicle-exchange-network.com/msp
+  - &manufacturer
+    Name: manufacturerMSP
+    ID: manufacturerMSP
+    MSPDir: crypto-config/peerOrganizations/manufacturer.vehicle-exchange-network.com/msp
     Policies:
       Readers:
         Type: Signature
-        Rule: "OR('carcompanyMSP.admin', 'carcompanyMSP.peer', 'carcompanyMSP.client')"
+        Rule: "OR('manufacturerMSP.admin', 'manufacturerMSP.peer', 'manufacturerMSP.client')"
       Writers:
         Type: Signature
-        Rule: "OR('carcompanyMSP.admin', 'carcompanyMSP.peer', 'carcompanyMSP.client')"
+        Rule: "OR('manufacturerMSP.admin', 'manufacturerMSP.peer', 'manufacturerMSP.client')"
       Admins:
         Type: Signature
-        Rule: "OR('carcompanyMSP.admin', 'carcompanyMSP.peer', 'carcompanyMSP.client')"
+        Rule: "OR('manufacturerMSP.admin', 'manufacturerMSP.peer', 'manufacturerMSP.client')"
     AnchorPeers:
-      - Host: peer0.carcompany.vehicle-exchange-network.com
+      - Host: peer0.manufacturer.vehicle-exchange-network.com
         Port: 7051
 
-  - &ind1
-    Name: ind1MSP
-    ID: ind1MSP
-    MSPDir: crypto-config/peerOrganizations/ind1.vehicle-exchange-network.com/msp
+  - &individual1
+    Name: individual1MSP
+    ID: individual1MSP
+    MSPDir: crypto-config/peerOrganizations/individual1.vehicle-exchange-network.com/msp
     Policies:
       Readers:
         Type: Signature
-        Rule: "OR('ind1MSP.admin', 'ind1MSP.peer', 'ind1MSP.client')"
+        Rule: "OR('individual1MSP.admin', 'individual1MSP.peer', 'individual1MSP.client')"
       Writers:
         Type: Signature
-        Rule: "OR('ind1MSP.admin', 'ind1MSP.peer', 'ind1MSP.client')"
+        Rule: "OR('individual1MSP.admin', 'individual1MSP.peer', 'individual1MSP.client')"
       Admins:
         Type: Signature
-        Rule: "OR('ind1MSP.admin', 'ind1MSP.peer', 'ind1MSP.client')"
+        Rule: "OR('individual1MSP.admin', 'individual1MSP.peer', 'individual1MSP.client')"
     AnchorPeers:
-      - Host: peer0.ind1.vehicle-exchange-network.com
+      - Host: peer0.individual1.vehicle-exchange-network.com
         Port: 9051
 
-  - &ind2
-    Name: ind2MSP
-    ID: ind2MSP
-    MSPDir: crypto-config/peerOrganizations/ind2.vehicle-exchange-network.com/msp
+  - &individual2
+    Name: individual2MSP
+    ID: individual2MSP
+    MSPDir: crypto-config/peerOrganizations/individual2.vehicle-exchange-network.com/msp
     Policies:
       Readers:
         Type: Signature
-        Rule: "OR('ind2MSP.admin', 'ind2MSP.peer', 'ind2MSP.client')"
+        Rule: "OR('individual2MSP.admin', 'individual2MSP.peer', 'individual2MSP.client')"
       Writers:
         Type: Signature
-        Rule: "OR('ind2MSP.admin', 'ind2MSP.peer', 'ind2MSP.client')"
+        Rule: "OR('individual2MSP.admin', 'individual2MSP.peer', 'individual2MSP.client')"
       Admins:
         Type: Signature
-        Rule: "OR('ind2MSP.admin', 'ind2MSP.peer', 'ind2MSP.client')"
+        Rule: "OR('individual2MSP.admin', 'individual2MSP.peer', 'individual2MSP.client')"
     AnchorPeers:
-      - Host: peer0.ind2.vehicle-exchange-network.com
+      - Host: peer0.individual2.vehicle-exchange-network.com
         Port: 11051
 
-
-  - &ind3
-    Name: ind3MSP
-    ID: ind3MSP
-    MSPDir: crypto-config/peerOrganizations/ind3.vehicle-exchange-network.com/msp
+  - &individual3
+    Name: individual3MSP
+    ID: individual3MSP
+    MSPDir: crypto-config/peerOrganizations/individual3.vehicle-exchange-network.com/msp
     Policies:
       Readers:
         Type: Signature
-        Rule: "OR('ind3MSP.admin', 'ind3MSP.peer', 'ind3MSP.client')"
+        Rule: "OR('individual3MSP.admin', 'individual3MSP.peer', 'individual3MSP.client')"
       Writers:
         Type: Signature
-        Rule: "OR('ind3MSP.admin', 'ind3MSP.peer', 'ind3MSP.client')"
+        Rule: "OR('individual3MSP.admin', 'individual3MSP.peer', 'individual3MSP.client')"
       Admins:
         Type: Signature
-        Rule: "OR('ind3MSP.admin', 'ind3MSP.peer', 'ind3MSP.client')"
+        Rule: "OR('individual3MSP.admin', 'individual3MSP.peer', 'individual3MSP.client')"
     AnchorPeers:
-      - Host: peer0.ind3.vehicle-exchange-network.com
+      - Host: peer0.individual3.vehicle-exchange-network.com
         Port: 13051
 
-
+  
 
 #Capabilities
 
@@ -180,20 +179,23 @@ Profiles:
       Capabilities:
         <<: *OrdererCapabilities
     Consortiums:
-      VehicleExchangeConsortium:
+      PharmaConsortium:
         Organizations:
-        - *carcompany
-        - *ind1
-        - *ind2
-        - *ind3
+          - *manufacturer
+          - *individual1
+          - *individual2
+          - *individual3
+          
+
   vehicleexchangechannel:
-    Consortium: VehicleExchangeConsortium
+    Consortium: PharmaConsortium
     Application:
       <<: *ApplicationDefaults
       Organizations:
-        - *carcompany
-        - *ind1
-        - *ind2
-        - *ind3
+        - *manufacturer
+        - *individual1
+        - *individual2
+        - *individual3
+        
       Capabilities:
         <<: *ApplicationCapabilities

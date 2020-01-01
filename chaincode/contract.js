@@ -69,7 +69,7 @@ class VexnetContract extends Contract {
 
 
 
-	// Register the new car on the network
+	// Register the new car on the network 
 
 	 async function addCar(ctx,carSerialNo,carModelName,mfgDate,companyCRN) {
 
@@ -420,6 +420,6 @@ class VexnetContract extends Contract {
 	 }
 
 
-	 
+
 	 module.exports = VexnetContract;
 }
